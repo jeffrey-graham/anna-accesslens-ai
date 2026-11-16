@@ -1,0 +1,24 @@
+{
+  "file_map": {
+    "index.html": {
+      "byte_size": 31386,
+      "sha256": "c19cd7d34652247f71aa0a6d411a12b7ad1c5ca8f40fa9a7a0d445c6aae799ba",
+      "content_type": "text/html"
+    },
+    "assets/app.css": {
+      "byte_size": 24129,
+      "sha256": "f2382b3be99704f6d5a84dc825f50805cde0d299164524ee7fda28cfba9096a6",
+      "content_type": "text/css"
+    },
+    "assets/app.js": {
+      "byte_size": 109495,
+      "sha256": "0da7fb583f37187a3cbd6c12097c2d2eec2c5a15693e8af4302ac65b695dc07b",
+      "content_type": "application/javascript"
+    },
+    "assets/app-logo.png": {
+      "byte_size": 101312,
+      "sha256": "b287121937548149794b3ca0c324346abf2bd9445952c18d907cdcdbe08561f4",
+      "content_type": "image/png"
+    }
+  }
+}

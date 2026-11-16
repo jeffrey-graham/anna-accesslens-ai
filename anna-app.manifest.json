@@ -1,0 +1,102 @@
+{
+  "schema": 4,
+  "required_executas": [],
+  "optional_executas": [],
+  "system_prompt_addendum": "When the user mentions AccessLens AI to simplify dense medical, legal, financial, or technical text, extract action checklists or red-flag risks, open a dyslexia-friendly Bionic reading studio, audit/repair inaccessible HTML, narrate text aloud, or visualize a concept map, summon the interactive studio via open_app_view using this app's numeric app_id. Pass view ('main', 'checklist', 'dyslexia_studio', 'html_repair', 'narration', or 'concept_map') and payload ({'title': '...', 'text': '...', 'html': '...', 'domain': 'medical|legal|financial|technical', 'reading_level': 'grade5|consumer|executive'}).",
+  "tags": [
+    "accessibility",
+    "plain-language",
+    "wcag-2-2",
+    "dyslexia",
+    "document-clarity",
+    "concept-map",
+    "narration"
+  ],
+  "ui": {
+    "bundle": {
+      "format": "static-spa",
+      "entry": "index.html",
+      "external_origins": []
+    },
+    "views": [
+      {
+        "name": "main",
+        "title": "AccessLens AI — Plain-Language & Accessibility Studio",
+        "default": true,
+        "entry": "index.html",
+        "min_size": { "w": 640, "h": 500 },
+        "default_size": { "w": 1220, "h": 780 },
+        "max_size": { "w": 1920, "h": 1200 },
+        "resizable": true,
+        "movable": true,
+        "single_instance": true,
+        "summary_template": "AccessLens AI: {title}"
+      },
+      {
+        "name": "checklist",
+        "title": "AccessLens AI — Action Checklist & Risk Extractor",
+        "entry": "index.html#/checklist",
+        "min_size": { "w": 640, "h": 500 },
+        "default_size": { "w": 1160, "h": 740 },
+        "max_size": { "w": 1920, "h": 1200 },
+        "resizable": true,
+        "movable": true,
+        "single_instance": true
+      },
+      {
+        "name": "dyslexia_studio",
+        "title": "AccessLens AI — Dyslexia, Bionic & Low-Vision Studio",
+        "entry": "index.html#/dyslexia",
+        "min_size": { "w": 640, "h": 500 },
+        "default_size": { "w": 1180, "h": 760 },
+        "max_size": { "w": 1920, "h": 1200 },
+        "resizable": true,
+        "movable": true,
+        "single_instance": true
+      },
+      {
+        "name": "html_repair",
+        "title": "AccessLens AI — WCAG 2.2 HTML Auditor & Auto-Repair",
+        "entry": "index.html#/html-repair",
+        "min_size": { "w": 640, "h": 500 },
+        "default_size": { "w": 1220, "h": 780 },
+        "max_size": { "w": 1920, "h": 1200 },
+        "resizable": true,
+        "movable": true,
+        "single_instance": true
+      },
+      {
+        "name": "narration",
+        "title": "AccessLens AI — Synchronized Karaoke Narration",
+        "entry": "index.html#/narration",
+        "min_size": { "w": 600, "h": 480 },
+        "default_size": { "w": 1080, "h": 700 },
+        "max_size": { "w": 1920, "h": 1200 },
+        "resizable": true,
+        "movable": true,
+        "single_instance": true
+      },
+      {
+        "name": "concept_map",
+        "title": "AccessLens AI — Entity & Obligation Concept Map",
+        "entry": "index.html#/concept-map",
+        "min_size": { "w": 640, "h": 500 },
+        "default_size": { "w": 1220, "h": 760 },
+        "max_size": { "w": 1920, "h": 1200 },
+        "resizable": true,
+        "movable": true,
+        "single_instance": true
+      }
+    ],
+    "form_factors": ["desktop"],
+    "host_api": {
+      "credentials": [],
+      "agent": {
+        "tools": []
+      }
+    },
+    "browser_permissions": [],
+    "csp_overrides": {},
+    "state_merge": "last_writer_wins"
+  }
+}

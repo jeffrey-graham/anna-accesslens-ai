@@ -1,0 +1,600 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <title>AccessLens AI — Plain-Language, WCAG 2.2 &amp; Cognitive Accessibility Studio</title>
+  <link rel="icon" type="image/png" href="./assets/app-logo.png" />
+  <link rel="stylesheet" href="./assets/app.css" />
+</head>
+<body>
+  <a href="#main-workspace" class="skip-link">Skip to main accessibility workspace</a>
+
+  <!-- Animated Line Focus Ruler Overlay (ADHD / Dyslexia / Low-Vision Line Guide) -->
+  <div id="line-focus-overlay" class="line-focus-overlay" hidden aria-hidden="true">
+    <div id="line-focus-band" class="line-focus-band"></div>
+  </div>
+
+  <!-- Screen-Reader Polite Status Region (WCAG 4.1.3) -->
+  <div id="sr-announcer" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- Toast Feedback Banner -->
+  <div id="toast-banner" class="toast-banner" role="status" aria-live="polite" hidden></div>
+
+  <div class="app-shell">
+    <!-- Top Brand & Runtime Header -->
+    <header class="top-header" role="banner">
+      <div class="brand-cluster">
+        <img src="./assets/app-logo.png" alt="AccessLens AI optical clarity emblem" class="brand-logo" width="46" height="46" />
+        <div>
+          <div class="brand-title-row">
+            <h1>AccessLens AI</h1>
+            <span class="version-pill">WCAG 2.2 AAA</span>
+            <span id="runtime-badge" class="runtime-badge runtime-standalone" title="Runtime persistence and AI bridge status">
+              Standalone Studio · Local Memory
+            </span>
+          </div>
+          <p class="brand-subtitle">
+            Plain-language translator, action &amp; risk checklist, dyslexia/Bionic studio, WCAG HTML auto-repair, karaoke narration &amp; concept map
+          </p>
+        </div>
+      </div>
+
+      <div class="header-actions" role="toolbar" aria-label="Quick Theme, Ruler, and Anna AI Actions">
+        <div class="theme-switcher" role="group" aria-label="Color and Contrast Theme">
+          <button type="button" class="theme-chip is-active" data-set-theme="dark" title="Deep Slate Dark (17.4:1 contrast)">Dark</button>
+          <button type="button" class="theme-chip" data-set-theme="cream" title="Dyslexia Warm Cream (Low glare)">Cream</button>
+          <button type="button" class="theme-chip" data-set-theme="sepia" title="Soft Sepia Paper">Sepia</button>
+          <button type="button" class="theme-chip" data-set-theme="high-contrast" title="WCAG AAA 21:1 High-Contrast">AAA 21:1</button>
+        </div>
+        <button type="button" id="btn-toggle-ruler" class="btn-secondary" aria-pressed="false">
+          Line Ruler: Off
+        </button>
+        <button type="button" id="btn-anna-llm" class="btn-accent" title="Refine summary using Anna Host LLM (or run instant local engine)">
+          ✨ Deep Refine (Anna AI)
+        </button>
+        <button type="button" id="btn-share-chat" class="btn-secondary" title="Post plain-language brief &amp; checklist to Anna Chat or copy summary">
+          ↗ Share Brief
+        </button>
+      </div>
+    </header>
+
+    <!-- Instant 1-Click Real-World Sample Selector + Source Drawer Toggle -->
+    <section class="sample-bar" aria-label="Real-World Sample Documents and Input Editor">
+      <div class="sample-pills-wrap">
+        <span class="sample-label">Instant Demo Samples:</span>
+        <div class="sample-pills" role="group" aria-label="Load Domain Sample Document">
+          <button type="button" class="sample-pill is-active" data-sample-id="medical">
+            🏥 Medical Discharge &amp; EOB
+          </button>
+          <button type="button" class="sample-pill" data-sample-id="legal">
+            ⚖️ Legal SaaS MSA
+          </button>
+          <button type="button" class="sample-pill" data-sample-id="financial">
+            💳 Financial APR &amp; 10-K
+          </button>
+          <button type="button" class="sample-pill" data-sample-id="technical">
+            🔐 Technical CVE Advisory
+          </button>
+        </div>
+      </div>
+      <div class="sample-right-controls">
+        <button type="button" id="btn-toggle-editor" class="btn-secondary" aria-expanded="false" aria-controls="source-editor-drawer">
+          ✎ Edit / Paste Document
+        </button>
+      </div>
+    </section>
+
+    <!-- Collapsible Source Document Input Drawer -->
+    <section id="source-editor-drawer" class="editor-drawer card" hidden aria-label="Source Document Input">
+      <div class="editor-header">
+        <div>
+          <label for="doc-title-input" class="field-label">Document Title</label>
+          <input type="text" id="doc-title-input" class="text-input" value="Cardiology Discharge Instructions &amp; Anticoagulation Prior-Auth Notice" />
+        </div>
+        <div>
+          <label for="doc-domain-select" class="field-label">Domain Lens</label>
+          <select id="doc-domain-select" class="select-input">
+            <option value="auto">Auto-Detect Domain</option>
+            <option value="medical">Medical / Clinical / Insurance</option>
+            <option value="legal">Legal / Contract / Policy</option>
+            <option value="financial">Financial / Credit / SEC Filing</option>
+            <option value="technical">Technical / RFC / Security</option>
+          </select>
+        </div>
+      </div>
+      <div class="editor-body">
+        <label for="doc-source-textarea" class="field-label">
+          Paste Dense Medical, Legal, Financial, or Technical Text (`Ctrl+V`)
+        </label>
+        <textarea id="doc-source-textarea" class="source-textarea" rows="5"></textarea>
+      </div>
+      <div class="editor-footer">
+        <span id="live-char-counter" class="muted-meta">0 words</span>
+        <div class="btn-row">
+          <button type="button" id="btn-analyze-now" class="btn-accent">Transform All 6 Views</button>
+          <button type="button" id="btn-close-editor" class="btn-secondary">Collapse Editor</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Top-Line Accessibility & Clarity Telemetry KPIs -->
+    <section class="kpi-grid" aria-label="Document Clarity and Risk Metrics">
+      <article class="kpi-card">
+        <span class="kpi-eyebrow">Flesch-Kincaid Reading Level</span>
+        <div class="kpi-main">
+          <strong id="kpi-grade-after" class="kpi-value accent-emerald">Grade 5.8</strong>
+          <span id="kpi-grade-delta" class="kpi-badge badge-emerald">-10.9 Grades</span>
+        </div>
+        <span id="kpi-grade-before" class="kpi-sub">Was Grade 16.7 (Specialist Jargon)</span>
+      </article>
+
+      <article class="kpi-card">
+        <span class="kpi-eyebrow">Gunning Fog Clarity Score</span>
+        <div class="kpi-main">
+          <strong id="kpi-fog-after" class="kpi-value accent-cyan">7.2</strong>
+          <span id="kpi-fog-delta" class="kpi-badge badge-cyan">Plain-Language Ready</span>
+        </div>
+        <span id="kpi-fog-before" class="kpi-sub">Was 20.1 Fog · 6 Jargon Terms Defined</span>
+      </article>
+
+      <article class="kpi-card">
+        <span class="kpi-eyebrow">Action Checklist &amp; Deadlines</span>
+        <div class="kpi-main">
+          <strong id="kpi-actions-count" class="kpi-value">4 Actions</strong>
+          <span id="kpi-actions-done" class="kpi-badge badge-neutral">0 / 4 Done</span>
+        </div>
+        <span id="kpi-memory-status" class="kpi-sub">Synced to Persistent Memory</span>
+      </article>
+
+      <article class="kpi-card">
+        <span class="kpi-eyebrow">Red-Flag Risks &amp; WCAG HTML</span>
+        <div class="kpi-main">
+          <strong id="kpi-risks-count" class="kpi-value accent-amber">3 Red Flags</strong>
+          <span id="kpi-wcag-score" class="kpi-badge badge-emerald">HTML 33 → 100</span>
+        </div>
+        <span class="kpi-sub">Contraindications, Traps &amp; ARIA Repaired</span>
+      </article>
+    </section>
+
+    <!-- Primary 6-Capability Navigation Tablist -->
+    <nav class="main-tabs-nav" aria-label="AccessLens Capabilities">
+      <div class="tablist" role="tablist" aria-label="Six Core Accessibility Capabilities">
+        <button type="button" role="tab" id="tab-btn-plain" aria-selected="true" aria-controls="panel-plain" data-tab="plain" class="tab-btn is-active">
+          1. Plain-Language Brief
+        </button>
+        <button type="button" role="tab" id="tab-btn-checklist" aria-selected="false" aria-controls="panel-checklist" data-tab="checklist" class="tab-btn" tabindex="-1">
+          2. Action Checklist &amp; Risks
+        </button>
+        <button type="button" role="tab" id="tab-btn-dyslexia" aria-selected="false" aria-controls="panel-dyslexia" data-tab="dyslexia" class="tab-btn" tabindex="-1">
+          3. Dyslexia &amp; Bionic Studio
+        </button>
+        <button type="button" role="tab" id="tab-btn-html" aria-selected="false" aria-controls="panel-html" data-tab="html" class="tab-btn" tabindex="-1">
+          4. WCAG HTML Auto-Repair
+        </button>
+        <button type="button" role="tab" id="tab-btn-narration" aria-selected="false" aria-controls="panel-narration" data-tab="narration" class="tab-btn" tabindex="-1">
+          5. Karaoke Narration
+        </button>
+        <button type="button" role="tab" id="tab-btn-map" aria-selected="false" aria-controls="panel-map" data-tab="map" class="tab-btn" tabindex="-1">
+          6. Visual Concept Map
+        </button>
+      </div>
+    </nav>
+
+    <!-- Main Workspace Area -->
+    <main id="main-workspace" class="workspace-main">
+
+      <!-- =================================================================
+           PANEL 1: PLAIN-LANGUAGE SUMMARY, READING LEVELS & JARGON GLOSSARY
+           ================================================================= -->
+      <section id="panel-plain" role="tabpanel" aria-labelledby="tab-btn-plain" class="tab-panel">
+        <div class="panel-toolbar card">
+          <div class="reading-mode-group" role="group" aria-label="Target Reading Level Mode">
+            <span class="toolbar-label">Reading Mode:</span>
+            <button type="button" class="mode-pill is-active" data-reading-mode="grade5">
+              5th-Grade Everyday Plain English
+            </button>
+            <button type="button" class="mode-pill" data-reading-mode="consumer">
+              Patient / Consumer Clear Brief
+            </button>
+            <button type="button" class="mode-pill" data-reading-mode="executive">
+              Executive High-Signal Digest
+            </button>
+          </div>
+          <div class="btn-row">
+            <button type="button" id="btn-copy-plain" class="btn-secondary">Copy Plain Text</button>
+            <button type="button" id="btn-jump-narrate" class="btn-secondary">▶ Listen to This Summary</button>
+          </div>
+        </div>
+
+        <div class="two-col-layout">
+          <article class="card reader-card">
+            <div class="card-header-row">
+              <div>
+                <h2 id="plain-doc-heading">Plain-Language Translation</h2>
+                <p class="muted-meta">Tap, click, or press Enter on any underlined term for its plain-English definition.</p>
+              </div>
+              <span id="domain-pill" class="badge badge-cyan">MEDICAL</span>
+            </div>
+
+            <div id="plain-output-body" class="reading-surface" tabindex="0" aria-label="Simplified Plain-Language Output"></div>
+
+            <!-- Accessible Inline Definition Callout (Tap / Keyboard / Hover accessible!) -->
+            <div id="inline-term-popover" class="term-popover" role="region" aria-label="Selected Jargon Definition" hidden>
+              <div class="term-popover-head">
+                <strong id="popover-term-title">Term</strong>
+                <button type="button" id="btn-close-popover" class="btn-icon" aria-label="Close definition card">✕</button>
+              </div>
+              <p id="popover-term-plain" class="term-plain-line"></p>
+              <p id="popover-term-def" class="term-def-line"></p>
+            </div>
+          </article>
+
+          <aside class="side-stack">
+            <article class="card">
+              <h3>Before vs. After Readability Proof</h3>
+              <div class="metric-compare-list" id="readability-bars"></div>
+            </article>
+
+            <article class="card">
+              <div class="card-header-row">
+                <h3>Original Dense Text</h3>
+                <span id="orig-word-badge" class="badge badge-neutral">0 words</span>
+              </div>
+              <div id="original-reference-box" class="original-text-box" tabindex="0"></div>
+            </article>
+          </aside>
+        </div>
+
+        <section class="card glossary-section" aria-labelledby="glossary-heading">
+          <div class="card-header-row">
+            <div>
+              <h3 id="glossary-heading">Extracted Jargon Glossary (<span id="glossary-count">0</span> Terms)</h3>
+              <p class="muted-meta">Every technical, clinical, legal, or financial term translated into everyday language.</p>
+            </div>
+            <input type="search" id="glossary-filter-input" class="text-input compact-search" placeholder="Filter glossary terms..." aria-label="Filter glossary terms" />
+          </div>
+          <div id="glossary-cards-grid" class="glossary-grid"></div>
+        </section>
+      </section>
+
+      <!-- =================================================================
+           PANEL 2: PRIORITIZED ACTION CHECKLIST & RED-FLAG RISK EXTRACTOR
+           ================================================================= -->
+      <section id="panel-checklist" role="tabpanel" aria-labelledby="tab-btn-checklist" class="tab-panel" hidden>
+        <div class="panel-toolbar card">
+          <div class="progress-summary-wrap">
+            <strong id="checklist-progress-label">0 of 0 Actions Completed</strong>
+            <div class="progress-track" aria-hidden="true">
+              <div id="checklist-progress-fill" class="progress-fill" style="width: 0%"></div>
+            </div>
+          </div>
+          <div class="btn-row">
+            <button type="button" id="btn-export-ics" class="btn-accent">📅 Export `.ics` Calendar</button>
+            <button type="button" id="btn-export-md" class="btn-secondary">⬇ Export Markdown</button>
+            <button type="button" id="btn-reset-checks" class="btn-secondary">Reset Checks</button>
+          </div>
+        </div>
+
+        <div class="two-col-layout">
+          <article class="card">
+            <div class="card-header-row">
+              <div>
+                <h2>Concrete Action Checklist (Who · What · By When)</h2>
+                <p class="muted-meta">Checkmarks save automatically to Anna Persistent Storage (`anna.storage`) &amp; local memory.</p>
+              </div>
+            </div>
+
+            <ul id="checklist-items-list" class="checklist-list" aria-label="Prioritized Action Items"></ul>
+
+            <form id="custom-task-form" class="add-task-form" aria-label="Add Custom Follow-Up Task">
+              <label for="custom-task-input" class="sr-only">Add custom action item</label>
+              <input type="text" id="custom-task-input" class="text-input" placeholder="Add a personal follow-up question or task (saved to memory)..." required />
+              <input type="text" id="custom-task-when" class="text-input compact-when" placeholder="By when (e.g. Friday)" />
+              <button type="submit" class="btn-secondary">+ Add Task</button>
+            </form>
+          </article>
+
+          <aside class="card">
+            <div class="card-header-row">
+              <div>
+                <h2>Red-Flag Clauses &amp; Safety Warnings</h2>
+                <p class="muted-meta">High-impact traps, contraindications, penalties, and waivers detected.</p>
+              </div>
+              <span id="redflag-badge" class="badge badge-amber">0 Flags</span>
+            </div>
+            <div id="redflag-list" class="redflag-list"></div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- =================================================================
+           PANEL 3: DYSLEXIA-FRIENDLY, ADHD BIONIC & LOW-VISION STUDIO
+           ================================================================= -->
+      <section id="panel-dyslexia" role="tabpanel" aria-labelledby="tab-btn-dyslexia" class="tab-panel" hidden>
+        <div class="studio-layout">
+          <aside class="card controls-panel" aria-label="Typography, Spacing, and Focus Controls">
+            <div class="card-header-row">
+              <h2>WCAG AAA Reading Controls</h2>
+              <button type="button" id="btn-dyslexia-preset" class="btn-accent compact-btn">WCAG 1.4.12 Preset</button>
+            </div>
+            <p class="muted-meta">Zero-layout-shift controls saved automatically to your personal profile.</p>
+
+            <div class="control-group">
+              <label for="ctrl-font-family" class="field-label">Typeface Family</label>
+              <select id="ctrl-font-family" class="select-input">
+                <option value="dyslexia">Dyslexia Humanist (Verdana / OpenDyslexic)</option>
+                <option value="sans" selected>Clean Geometric Sans (Inter / System)</option>
+                <option value="serif">High-Legibility Editorial Serif</option>
+                <option value="mono">Accessible Clear Monospace</option>
+              </select>
+            </div>
+
+            <div class="control-group">
+              <label for="ctrl-bionic-level" class="field-label">ADHD Bionic Fixation Bolding</label>
+              <select id="ctrl-bionic-level" class="select-input">
+                <option value="0">Off (Standard Weight)</option>
+                <option value="0.35">Gentle Fixation (35% Lead Letters)</option>
+                <option value="0.45" selected>Balanced Bionic Focus (45%)</option>
+                <option value="0.60">Strong Saccadic Anchor (60%)</option>
+              </select>
+            </div>
+
+            <div class="control-toggle-row">
+              <label class="checkbox-label" for="ctrl-syllable-dots">
+                <input type="checkbox" id="ctrl-syllable-dots" />
+                <span>Syllable Decoding Dots (<code>an·ti·co·ag·u·la·tion</code>)</span>
+              </label>
+            </div>
+
+            <div class="control-toggle-row">
+              <label class="checkbox-label" for="ctrl-studio-ruler">
+                <input type="checkbox" id="ctrl-studio-ruler" />
+                <span>Animated Line Focus Ruler (Mouse + ↑/↓ Keys)</span>
+              </label>
+            </div>
+
+            <div class="control-group">
+              <div class="slider-head">
+                <label for="ctrl-font-size">Text Size</label>
+                <output id="out-font-size" for="ctrl-font-size">19px</output>
+              </div>
+              <input type="range" id="ctrl-font-size" min="16" max="26" step="1" value="19" />
+            </div>
+
+            <div class="control-group">
+              <div class="slider-head">
+                <label for="ctrl-letter-spacing">Letter Spacing</label>
+                <output id="out-letter-spacing" for="ctrl-letter-spacing">0.06em</output>
+              </div>
+              <input type="range" id="ctrl-letter-spacing" min="0" max="0.20" step="0.02" value="0.06" />
+            </div>
+
+            <div class="control-group">
+              <div class="slider-head">
+                <label for="ctrl-word-spacing">Word Spacing</label>
+                <output id="out-word-spacing" for="ctrl-word-spacing">0.10em</output>
+              </div>
+              <input type="range" id="ctrl-word-spacing" min="0" max="0.28" step="0.02" value="0.10" />
+            </div>
+
+            <div class="control-group">
+              <div class="slider-head">
+                <label for="ctrl-line-height">Line Height</label>
+                <output id="out-line-height" for="ctrl-line-height">1.9</output>
+              </div>
+              <input type="range" id="ctrl-line-height" min="1.5" max="2.4" step="0.1" value="1.9" />
+            </div>
+
+            <div class="control-group">
+              <div class="slider-head">
+                <label for="ctrl-measure">Column Width (Measure)</label>
+                <output id="out-measure" for="ctrl-measure">66ch</output>
+              </div>
+              <input type="range" id="ctrl-measure" min="50" max="85" step="5" value="66" />
+            </div>
+
+            <button type="button" id="btn-reset-typography" class="btn-secondary full-width">
+              Reset Default Typography
+            </button>
+          </aside>
+
+          <article class="card dyslexia-canvas-card">
+            <div class="card-header-row">
+              <div>
+                <h2>Dyslexia &amp; Neurodivergent Focus Canvas</h2>
+                <p class="muted-meta">Press ↑ / ↓ Arrow keys inside this reader to step paragraph-by-paragraph with focus highlighting.</p>
+              </div>
+              <span class="badge badge-emerald">WCAG 1.4.6 + 1.4.12</span>
+            </div>
+            <div id="dyslexia-reading-canvas" class="dyslexia-surface" tabindex="0" aria-label="Dyslexia and Bionic Focus Reading Studio"></div>
+          </article>
+        </div>
+      </section>
+
+      <!-- =================================================================
+           PANEL 4: AUTOMATED WCAG 2.2 HTML AUDITOR & AUTO-REPAIR ENGINE
+           ================================================================= -->
+      <section id="panel-html" role="tabpanel" aria-labelledby="tab-btn-html" class="tab-panel" hidden>
+        <div class="card html-input-card">
+          <div class="card-header-row">
+            <div>
+              <h2>Paste Raw / Inaccessible HTML Snippet</h2>
+              <p class="muted-meta">Detects missing <code>alt</code>, unlabeled inputs, broken heading jumps, <code>div onclick</code> traps, vague links, tables, landmarks &amp; low-contrast styles.</p>
+            </div>
+            <div class="btn-row">
+              <button type="button" id="btn-load-sample-html" class="btn-secondary">Load Domain Broken HTML</button>
+              <button type="button" id="btn-audit-html" class="btn-accent">Audit &amp; Auto-Repair HTML</button>
+            </div>
+          </div>
+          <label for="html-source-textarea" class="sr-only">Raw HTML snippet to audit and repair</label>
+          <textarea id="html-source-textarea" class="code-textarea" rows="7" spellcheck="false"></textarea>
+        </div>
+
+        <div class="html-score-strip card">
+          <div class="score-pill-pair">
+            <div class="score-box score-before">
+              <span class="kpi-eyebrow">Before WCAG Score</span>
+              <strong id="html-score-before">33 / 100</strong>
+            </div>
+            <span class="score-arrow" aria-hidden="true">→</span>
+            <div class="score-box score-after">
+              <span class="kpi-eyebrow">Repaired WCAG Score</span>
+              <strong id="html-score-after">100 / 100</strong>
+            </div>
+          </div>
+          <div class="html-summary-meta">
+            <strong id="html-issues-summary">6 WCAG 2.2 Violations Automatically Repaired</strong>
+            <p class="muted-meta">Semantic landmarks, native keyboard buttons, explicit form labels, sequential headings &amp; ≥7:1 AAA contrast applied.</p>
+          </div>
+          <button type="button" id="btn-copy-repaired-html" class="btn-accent">Copy Repaired HTML</button>
+        </div>
+
+        <div class="two-col-layout">
+          <article class="card">
+            <h3>Detected Violations &amp; Applied Fixes</h3>
+            <div id="html-issues-list" class="issues-list"></div>
+          </article>
+
+          <article class="card">
+            <div class="card-header-row">
+              <h3>Repaired Semantic HTML + ARIA &amp; Diff</h3>
+              <div class="mini-tabs" role="group" aria-label="HTML Output View Mode">
+                <button type="button" class="mode-pill is-active" data-html-view="repaired">Repaired HTML</button>
+                <button type="button" class="mode-pill" data-html-view="diff">Unified Diff</button>
+                <button type="button" class="mode-pill" data-html-view="sidebyside">Side-by-Side</button>
+              </div>
+            </div>
+            <div id="html-code-output-wrap">
+              <pre id="html-repaired-pre" class="code-pre" tabindex="0"></pre>
+              <div id="html-sidebyside-grid" class="sidebyside-code" hidden>
+                <div>
+                  <span class="field-label">Original Broken HTML</span>
+                  <pre id="html-orig-pre" class="code-pre"></pre>
+                </div>
+                <div>
+                  <span class="field-label">Repaired WCAG 2.2 HTML</span>
+                  <pre id="html-rep-side-pre" class="code-pre"></pre>
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- =================================================================
+           PANEL 5: NATURAL WEB-SPEECH NARRATION WITH KARAOKE HIGHLIGHTING
+           ================================================================= -->
+      <section id="panel-narration" role="tabpanel" aria-labelledby="tab-btn-narration" class="tab-panel" hidden>
+        <div class="card narration-transport-card">
+          <div class="transport-primary">
+            <button type="button" id="btn-tts-prev" class="btn-secondary" aria-label="Previous sentence">⏮ Prev</button>
+            <button type="button" id="btn-tts-play" class="btn-accent play-btn">▶ Play Narration</button>
+            <button type="button" id="btn-tts-pause" class="btn-secondary">⏸ Pause</button>
+            <button type="button" id="btn-tts-stop" class="btn-secondary">⏹ Stop</button>
+            <button type="button" id="btn-tts-next" class="btn-secondary" aria-label="Next sentence">Next ⏭</button>
+          </div>
+
+          <div class="transport-knobs">
+            <div class="knob-field">
+              <label for="tts-speed-select" class="field-label">Speed</label>
+              <select id="tts-speed-select" class="select-input compact-select">
+                <option value="0.75">0.75x Calm</option>
+                <option value="0.9">0.90x Clear</option>
+                <option value="1" selected>1.00x Natural</option>
+                <option value="1.15">1.15x Brisk</option>
+                <option value="1.25">1.25x Fast</option>
+                <option value="1.5">1.50x Rapid</option>
+                <option value="1.75">1.75x Scan</option>
+              </select>
+            </div>
+
+            <div class="knob-field">
+              <label for="tts-pitch-select" class="field-label">Pitch</label>
+              <select id="tts-pitch-select" class="select-input compact-select">
+                <option value="0.85">0.85 Warm Low</option>
+                <option value="1" selected>1.00 Neutral</option>
+                <option value="1.15">1.15 Crisp High</option>
+              </select>
+            </div>
+
+            <div class="knob-field voice-field">
+              <label for="tts-voice-select" class="field-label">Voice / Engine</label>
+              <select id="tts-voice-select" class="select-input"></select>
+            </div>
+          </div>
+        </div>
+
+        <article class="card karaoke-card">
+          <div class="card-header-row">
+            <div>
+              <h2>Synchronized Sentence Karaoke Reader</h2>
+              <p class="muted-meta">Click or press Enter on any sentence below to jump playback directly to that sentence.</p>
+            </div>
+            <span id="tts-progress-pill" class="badge badge-cyan">Ready · Sentence 1</span>
+          </div>
+          <div id="karaoke-sentences-list" class="karaoke-list" role="list" aria-label="Narrated Sentences"></div>
+        </article>
+      </section>
+
+      <!-- =================================================================
+           PANEL 6: INTERACTIVE VISUAL CONCEPT MAP (<= 24 CRISP NODES)
+           ================================================================= -->
+      <section id="panel-map" role="tabpanel" aria-labelledby="tab-btn-map" class="tab-panel" hidden>
+        <div class="panel-toolbar card">
+          <div class="map-filter-pills" role="group" aria-label="Filter Concept Map Node Types">
+            <span class="toolbar-label">Highlight:</span>
+            <button type="button" class="mode-pill is-active" data-map-filter="all">All Nodes</button>
+            <button type="button" class="mode-pill" data-map-filter="party">Parties</button>
+            <button type="button" class="mode-pill" data-map-filter="obligation">Obligations</button>
+            <button type="button" class="mode-pill" data-map-filter="deadline">Deadlines</button>
+            <button type="button" class="mode-pill" data-map-filter="risk">Risks</button>
+          </div>
+          <div class="btn-row">
+            <button type="button" id="btn-zoom-out" class="btn-secondary" aria-label="Zoom out concept map">− Zoom</button>
+            <button type="button" id="btn-zoom-reset" class="btn-secondary">100%</button>
+            <button type="button" id="btn-zoom-in" class="btn-secondary" aria-label="Zoom in concept map">+ Zoom</button>
+          </div>
+        </div>
+
+        <div class="map-workspace-grid">
+          <article class="card map-canvas-card">
+            <div class="card-header-row">
+              <div>
+                <h2>Entity, Obligation &amp; Cause-Effect Concept Graph</h2>
+                <p id="map-a11y-caption" class="muted-meta">Keyboard navigable: press Tab to move between nodes and Enter to inspect connections.</p>
+              </div>
+              <span id="map-node-count-badge" class="badge badge-emerald">0 Nodes (&le;24 Cap)</span>
+            </div>
+
+            <div id="concept-map-viewport" class="map-svg-viewport">
+              <svg id="concept-map-svg" viewBox="0 0 980 540" role="group" aria-label="Interactive Document Concept Map"></svg>
+            </div>
+
+            <div class="map-legend" aria-label="Node Color Legend">
+              <span class="legend-item"><i class="dot dot-hub"></i> Document Hub</span>
+              <span class="legend-item"><i class="dot dot-party"></i> Party / Actor</span>
+              <span class="legend-item"><i class="dot dot-ob"></i> Obligation</span>
+              <span class="legend-item"><i class="dot dot-dl"></i> Deadline</span>
+              <span class="legend-item"><i class="dot dot-risk"></i> Red-Flag Risk</span>
+              <span class="legend-item"><i class="dot dot-concept"></i> Defined Term</span>
+            </div>
+          </article>
+
+          <aside class="card map-inspector-card" aria-live="polite">
+            <h3>Node &amp; Relationship Inspector</h3>
+            <div id="map-node-inspector" class="node-inspector-body"></div>
+          </aside>
+        </div>
+      </section>
+
+    </main>
+
+    <footer class="app-footer" role="contentinfo">
+      <span><strong>AccessLens AI</strong> (`@jeffrey-graham/accesslens-ai`) · Built for Anna OS (`anna.partners`)</span>
+      <span>WCAG 2.2 AAA · Zero External Keys Required · Hybrid Local + Anna Host Runtime</span>
+    </footer>
+  </div>
+
+  <script type="module" src="./assets/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,3 @@
+# Core Web App, MCP 2024-11-05 Server, and Bundle Builder run on Python 3.10+ stdlib only.
+# Pillow is optional (used only by scripts/generate_logo.py to regenerate assets/app-logo.png).
+Pillow>=10.0.0
